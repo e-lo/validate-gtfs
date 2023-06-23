@@ -4,7 +4,7 @@ on: push
 
 env:
   VALIDATOR_VERSION: latest
-  GTFS_URL: http://gtfs.bigbluebus.com/current.zip
+  GTFS_EXAMPLE_PATH: examples/alhambra-ca-us.zip
 
 jobs:
   test-url:
@@ -12,5 +12,6 @@ jobs:
     steps:
       - name: 'Pull canonical GTFS validator, version: ${{ env.VALIDATOR_VERSION }}'
         run: docker pull ghcr.io/mobilitydata/gtfs-validator:${{ env.VALIDATOR_VERSION }}
+      - uses: actions/checkout@v3
       - name: Test GTFS at URL
-        run: docker run --rm ghcr.io/mobilitydata/gtfs-validator:${{ env.VALIDATOR_VERSION }} -i ${{ env.GTFS_URL }} -o /tmp/gtfs-output
+        run: docker run --rm ghcr.io/mobilitydata/gtfs-validator:${{ env.VALIDATOR_VERSION }} -i ${{ env.GTFS_EXAMPLE_PATH }} -o /tmp/gtfs-output
