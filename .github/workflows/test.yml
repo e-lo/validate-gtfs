@@ -16,9 +16,9 @@ jobs:
         run: |
           docker run \
             --rm \
-            --volume "$(pwd)/examples:/gtfs" \
+            --volume "$(pwd):/gtfs" \
             ghcr.io/mobilitydata/gtfs-validator:${{ env.VALIDATOR_VERSION }} \
-              -i /gtfs/alhambra-ca-us.zip \
+              -i /gtfs/examples/alhambra-ca-us.zip \
               -o /gtfs/validator-output
       - uses: actions/upload-artifact@v3
         with:
