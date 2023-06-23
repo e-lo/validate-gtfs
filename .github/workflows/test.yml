@@ -1,13 +1,16 @@
 name: test-action
+
 on: push
+
+env:
+  VALIDATOR_VERSION: latest
+  GTFS_URL: http://gtfs.bigbluebus.com/current.zip
+
 jobs:
   test-url:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: 'Pull canonical GTFS validator, version: ${{ env.VALIDATOR_VERSION }}'
+        run: docker pull ghcr.io/mobilitydata/gtfs-validator:${{ env.VALIDATOR_VERSION }}
       - name: Test GTFS at URL
-        uses: ./
-        with:
-          gtfs: http://gtfs.bigbluebus.com/current.zip
-          validator-version: latest
-  
+        run: docker run --rm ghcr.io/mobilitydata/gtfs-validator:${{ env.VALIDATOR_VERSION }} -i ${{ env.GTFS_URL }} -o /tmp/gtfs-output
