@@ -13,5 +13,6 @@ jobs:
       - name: 'Pull canonical GTFS validator, version: ${{ env.VALIDATOR_VERSION }}'
         run: docker pull ghcr.io/mobilitydata/gtfs-validator:${{ env.VALIDATOR_VERSION }}
       - uses: actions/checkout@v3
-      - name: Test GTFS at URL
+      - uses: mxschmitt/action-tmate@v3
+      - name: Test local example feed
         run: docker run --rm ghcr.io/mobilitydata/gtfs-validator:${{ env.VALIDATOR_VERSION }} -i ${{ env.GTFS_EXAMPLE_PATH }} -o /tmp/gtfs-output
