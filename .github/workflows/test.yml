@@ -1,0 +1,13 @@
+name: test-action
+on: push
+jobs:
+  test-url:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Test GTFS at URL
+        uses: ./
+        with:
+          gtfs: http://gtfs.bigbluebus.com/current.zip
+          validator-version: latest
+  
