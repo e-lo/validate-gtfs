@@ -20,3 +20,7 @@ jobs:
             ghcr.io/mobilitydata/gtfs-validator:${{ env.VALIDATOR_VERSION }} \
               -i /gtfs/alhambra-ca-us.zip \
               -o /gtfs/validator-output
+      - uses: actions/upload-artifact@v3
+        with:
+          name: validator-output
+          path: ./validator-output/
