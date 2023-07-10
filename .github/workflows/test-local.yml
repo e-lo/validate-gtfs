@@ -19,8 +19,15 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run GTFS Validator Action
-        uses: ./action.yml
+        id: gtfs-validator
+        uses: action.yml
         with:
           gtfs-file: examples/alhambra-ca-us.zip
           validator-version: 'latest'
           update-readme-badge: 'true'
+
+      - name: Store Validation Report Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: GTFS Validation Report
+          path: ${{ steps.gtfs-validator.outputs.validation-report-path }}
