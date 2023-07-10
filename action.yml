@@ -1,0 +1,100 @@
+name: GTFS Validator Action
+description: Validate GTFS dataset using MobilityData GTFS Validator
+
+inputs:
+  gtfs-file:
+    description: 'Path or URL of the GTFS dataset file'
+    required: true
+  validator-version:
+    description: 'Version of the GTFS Validator to use (default: latest)'
+    required: false
+    default: 'latest'
+  update-readme-badge:
+    description: 'Update the badge status in README.md? (default: true)'
+    required: false
+    default: 'true'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Download GTFS Validator
+      run: |
+        mkdir gtfs-validator
+        curl -LJO https://github.com/MobilityData/gtfs-validator/releases/${{ inputs.validator-version }}/download/gtfs-validator.jar
+        mv gtfs-validator.jar gtfs-validator/
+
+    - name: Validate GTFS dataset
+      id: validation
+      run: |
+        java -jar gtfs-validator/gtfs-validator.jar --input ${{ inputs.gtfs-file }} --output_directory report/
+
+    - name: Post validation report as PR comment
+      if: ${{ github.event_name == 'pull_request' }}
+      uses: actions/github-script@v4
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const fs = require('fs');
+          const report = fs.readFileSync('report/report.html', 'utf8');
+          const context = github.context;
+          const { owner, repo, number } = context.issue;
+
+          const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
+          await octokit.rest.issues.createComment({
+            owner,
+            repo,
+            issue_number: number,
+            body: 'GTFS Validation Report:\n' + report,
+          });
+
+    - name: Update validation badge
+      uses: actions/github-script@v4
+      if: ${{ inputs.update-readme-badge == 'true' }}
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const { owner, repo, number } = context.issue;
+          const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
+
+          const badgeStatus = ${{ steps.validation.outputs.status }};
+          const badgeColor = ${{ steps.validation.outputs.color }};
+          const badge = `![GTFS Validation](https://img.shields.io/badge/GTFS%20Validation-${badgeStatus}-${badgeColor}.svg)`;
+
+          const { data: comments } = await octokit.rest.issues.listComments({
+            owner,
+            repo,
+            issue_number: number,
+          });
+
+          const validationComment = comments.find((comment) =>
+            comment.body.startsWith('GTFS Validation Report:')
+          );
+
+          if (validationComment) {
+            const commentId = validationComment.id;
+            await octokit.rest.issues.updateComment({
+              owner,
+              repo,
+              comment_id: commentId,
+              body: validationComment.body + '\n\n' + badge,
+            });
+          }
+
+          // Update badge status in README.md
+          const readme = fs.readFileSync('README.md', 'utf8');
+          const updatedReadme = readme.replace(
+            /!\[GTFS Validation\]\(.*?\)/,
+            badge
+          );
+          fs.writeFileSync('README.md', updatedReadme);
+
+          core.setOutput('badge', badge);
+
+    - name: Upload report as artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: GTFS Validation Report
+        path: report/

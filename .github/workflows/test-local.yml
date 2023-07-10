@@ -1,0 +1,26 @@
+name: GTFS Validation Workflow
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize]
+  push:
+    branches-ignore:
+      - 'refs/pull/**'
+  schedule:
+    - cron: '0 0 * * *' # Runs every day at 00:00 UTC
+
+jobs:
+  test_validate_local_gtfs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Run GTFS Validator Action
+        uses: ./action.yml
+        with:
+          gtfs-file: examples/alhambra-ca-us.zip
+          validator-version: 'latest'
+          update-readme-badge: 'true'

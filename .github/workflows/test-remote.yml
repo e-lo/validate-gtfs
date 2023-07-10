@@ -1,0 +1,23 @@
+name: Validate remote URL 
+
+on:
+    workflow_dispatch:
+    schedule:
+        - cron: '0 0 * * *' # Runs every day at 00:00 UTC
+
+jobs:
+  test_validate_local_gtfs:
+    runs-on: ubuntu-latest
+    strategy:
+        matrix:
+            gtfs-file:
+                - https://github.com/LACMTA/los-angeles-regional-gtfs/blob/main/bellflower-ca-us/bellflower-ca-us.zip
+                - https://github.com/LACMTA/los-angeles-regional-gtfs/blob/main/sierramadre-ca-us/sierramadre-ca-us.zip
+                - https://github.com/LACMTA/los-angeles-regional-gtfs/blob/main/lynwood-ca-us/lynwood-ca-us.zip
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Run GTFS Validator Action
+        uses: ./action.yml
