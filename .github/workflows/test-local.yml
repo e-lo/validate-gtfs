@@ -20,7 +20,7 @@ jobs:
 
       - name: Run GTFS Validator Action
         id: gtfs-validator
-        uses: action.yml
+        uses: ./action.yml
         with:
           gtfs-file: examples/alhambra-ca-us.zip
           validator-version: 'latest'
