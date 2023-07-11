@@ -11,7 +11,7 @@ on:
     - cron: '0 0 * * *' # Runs every day at 00:00 UTC
 
 jobs:
-  test_validate_local_gtfs:
+  test_validating_local_gtfs:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,7 +20,7 @@ jobs:
 
       - name: Run GTFS Validator Action
         id: gtfs-validator
-        uses: ../action.yml
+        uses: ./
         with:
           gtfs-file: examples/alhambra-ca-us.zip
           validator-version: 'latest'

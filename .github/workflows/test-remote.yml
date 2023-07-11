@@ -6,7 +6,7 @@ on:
         - cron: '0 0 * * *' # Runs every day at 00:00 UTC
 
 jobs:
-  test_validate_local_gtfs:
+  test_validating_remote_gtfs:
     runs-on: ubuntu-latest
     strategy:
         matrix:
@@ -20,4 +20,4 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run GTFS Validator Action
-        uses: ../action.yml
+        uses: ./
