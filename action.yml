@@ -35,12 +35,12 @@ runs:
       run: |
         java -jar gtfs-validator/gtfs-validator.jar --input ${{ inputs.gtfs-file }} --output_directory report/
       shell: bash
-      
+
     - name: Post validation report as PR comment
       if: ${{ github.event_name == 'pull_request' }}
       uses: actions/github-script@v4
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ inputs.github-token }}
         script: |
           const fs = require('fs');
           const report = fs.readFileSync('report/report.html', 'utf8');
@@ -59,7 +59,7 @@ runs:
       uses: actions/github-script@v4
       if: ${{ inputs.update-readme-badge == 'true' }}
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ inputs.github-token }}
         script: |
           const { owner, repo, number } = context.issue;
           const octokit = github.getOctokit(process.env.GITHUB_TOKEN);

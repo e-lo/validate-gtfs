@@ -21,3 +21,5 @@ jobs:
 
       - name: Run GTFS Validator Action
         uses: ./
+        with:
+            github-token: ${{ secrets.GITHUB_TOKEN }}
