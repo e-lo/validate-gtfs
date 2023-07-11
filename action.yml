@@ -19,18 +19,23 @@ runs:
   steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-
+    - name: Set up Java
+      uses: actions/setup-java@v2
+      with:
+        java-version: '12'
     - name: Download GTFS Validator
       run: |
         mkdir gtfs-validator
         curl -LJO https://github.com/MobilityData/gtfs-validator/releases/${{ inputs.validator-version }}/download/gtfs-validator.jar
         mv gtfs-validator.jar gtfs-validator/
+      shell: bash
 
     - name: Validate GTFS dataset
       id: validation
       run: |
         java -jar gtfs-validator/gtfs-validator.jar --input ${{ inputs.gtfs-file }} --output_directory report/
-
+      shell: bash
+      
     - name: Post validation report as PR comment
       if: ${{ github.event_name == 'pull_request' }}
       uses: actions/github-script@v4
